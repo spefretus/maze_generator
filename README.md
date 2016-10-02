@@ -1,2 +1,2 @@
-# simple maze
-simple maze generator using massive of '_' and '|' symbols
+# maze generator
+simple maze generator using the massive
