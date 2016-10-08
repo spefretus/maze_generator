@@ -1,2 +1,2 @@
 # simple maze
-simple maze generator using massive of '_' and '|' symbols
+simple maze generator using array and direction tracking
