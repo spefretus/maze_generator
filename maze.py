@@ -5,79 +5,123 @@
 import math
 import random
 
-#основное движение
+#наличие ходов (непройденных клеток) во всем лабиринте
+def check_possibility(full):
+	for x in range(1, dlin-1, 2):
+		if maze[x].count(full) > 0:
+			return 'yes'
+			break
+		elif maze[x].count(full) == 0:
+			if x == dlin-2:
+				return 'no'
+				break
+			elif x < dlin-1:
+				continue
+			else:
+				print ('exception')
+				break
+		else:
+			print ('exception')
+			break
+
+#проверка на тупик (отсутствие ходов из данной позиции)
+def check_dead_end():
+	if (x == dlin-2 or maze[x+2][y] == space) and (y == shir-1 or maze[x][y+4] == space) and (x == 1 or maze[x-2][y] == space) and (y == 2 or maze[x][y-4] == space):
+		return 'yes'
+	else:
+		return 'no'	
+
+
+#основное движение с запоминанием ходов
 def check_direction():
 	global x
 	global y
-	if (x+3>dlin or maze[x+2][y] == ' ') and (y+4>shir or maze[x][y+2] == ' ') and (x-2<0 or maze[x-2][y] == ' ') and (y-2<0 or maze[x][y-2] == ' '):
-		x = 1
-		y = 1
-		recheck_direction()
-	elif 0 < x < dlin-1 or 0 < y < shir:
-		key = random.randint(0, 3)
-		if key == 0:
-			if x < dlin-2 and maze[x+2][y] == '*':
-				maze[x+1][y] = ' '
-				x = x+2
-				return x
-			else:
-				return check_direction()
-		elif key == 1:
-			if y < shir-3 and maze[x][y+2] == '*':
-				maze[x][y+1] = ' '
-				y = y+2
-				return y
-			else:
-				return check_direction()
-		elif key == 2:
-			if x > 2 and maze[x-2][y] == '*':
-				maze[x-1][y] = ' '
-				x = x-2
-				return x
-			else:
-				return check_direction()
-		elif key == 3:
-			if y > 2 and maze[x][y-2] == '*':
-				maze[x][y-1] = ' '
-				y = y-2
-				return y
-			else:
-				return check_direction()
-		else:
-			recheck_direction()
+	global keychain
+	key = random.randint(0, 3)
+	if key == 0:
+		if x < dlin-2 and maze[x+2][y] == full:
+			maze[x+1][y] = maze[x+1][y-1] = maze[x+1][y+1] = space
+			x = x+2
+			keychain.append(key)
+			return x		
+			return keychain
+	elif key == 1:
+		if y < shir-1 and maze[x][y+4] == full:
+			maze[x][y+1] = maze[x][y+2] = maze[x][y+3] = space
+			y = y+4
+			keychain.append(key)
+			return y	
+			return keychain
+	elif key == 2:
+		if x > 1 and maze[x-2][y] == full:
+			maze[x-1][y] = maze[x-1][y-1] = maze[x-1][y+1] = space
+			x = x-2
+			keychain.append(key)
+			return x
+			return keychain
+	elif key == 3:
+		if y > 4 and maze[x][y-4] == full:
+			maze[x][y-1] = maze[x][y-2] = maze[x][y-3] = space
+			y = y-4
+			keychain.append(key)
+			return y
+			return keychain
 	else:
-		recheck_direction()
+		print ('exception')
+
+
 
 
 #выход из тупика
 def recheck_direction():
 	global x
 	global y
-	for x in range(1, dlin, 2):
-		for y in range(1, shir-3, 2):
-			if maze[x][y+2] == '*':
-				maze[x][y+1] = ' '
-				y = y+2
-				return x
-				return y
-			if x+2 < dlin-1 and maze[x+2][y] == '*':
-				maze [x+1][y] = ' '
-				x = x+2
-				return x
-				return y
-			else:
-				continue
+	global keychain
+	if check_dead_end() == 'yes':
+		last_key = keychain[-1]
+		if last_key == 0:
+			x = x-2
+			del keychain[-1]
+			return x
+			return keychain
+			return recheck_direction()
+		elif last_key == 1:
+			y = y-4
+			del keychain[-1]
+			return y
+			return keychain
+			return recheck_direction()
+		elif last_key == 2:
+			x = x+2
+			del keychain[-1]
+			return x
+			return keychain
+			return recheck_direction()
+		elif last_key == 3:
+			y = y+4
+			del keychain[-1]
+			return y
+			return keychain
+			return recheck_direction()
+
+	elif check_dead_end() == 'no':
+		return x
+		return y
+		return keychain
 
 
-#канва лабиринта
-n = input('Input maze level: ')
-a = [u'\u2503'.encode('utf-8'),'*']
 
-shir = len(a) * n
-dlin = shir+1
-cross = u'\u254B'.encode('utf-8')
+#вводные
+space = ' '
+full = 'x'
+line_ver = '|'
+line_hor = '_'
+'''
+space = u'\u0020'.encode('utf-8')
+full = u'\u2573'.encode('utf-8')
 line_hor = u'\u2501'.encode('utf-8')
 line_ver = u'\u2503'.encode('utf-8')
+cross = u'\u254B'.encode('utf-8')
 right = u'\u2523'.encode('utf-8')
 left = u'\u252B'.encode('utf-8')
 down = u'\u2533'.encode('utf-8')
@@ -86,40 +130,53 @@ corner_up_left = u'\u2513'.encode('utf-8')
 corner_up_right = u'\u250F'.encode('utf-8')
 corner_down_left = u'\u251B'.encode('utf-8')
 corner_down_right = u'\u2517'.encode('utf-8')
+'''
+
+#канва лабиринта
+n = int(input('Input maze width: '))
+a = [line_ver, space, full, space]
+
+shir = len(a) * n -1
+dlin = shir//2
 
 maze = [a * n for x in range(dlin)]
 for x in range(0, dlin, 2):
 	for y in range(0, shir, 2):
-		maze[x][y] = ' '
+		maze[x][y] = line_hor
 		maze[x][y+1] = line_hor
 
+
 for x in range(dlin):
-	del maze[x][-1]
+	maze[x][-1:-1] = maze[x][-1]
+	maze[x][0] = maze[x][-1] = line_ver
 
 
 #вход и выход лабиринта	
 x = 1
-y = 1
-maze[x][y] = ' '
-maze[1][0] = maze[-2][-1] = u'\u279d'.encode('utf-8')
+y = 2
+key = 5
+keychain = []
+maze[1][2] = space
+maze[1][0] = maze[-1][-3] = space
 
-#прогрызаем!
-for z in range(dlin*shir):
-	maze[x][y] = ' '
-	if 0 < x < dlin-1 and 0 < y < shir:
+
+##################### MAIN ############################
+##################### MAIN ############################
+while check_possibility(full) == 'yes':
+
+	maze[x][y] = space
+
+	if check_dead_end() == 'no':
 		check_direction()
 
+	elif check_dead_end() == 'yes':
+		recheck_direction()
+##################### MAIN ############################
+##################### MAIN ############################
+		
 
-
-# прихорашиваем
-
-# сливаем соседние горизонтали
-for x in range(0, dlin):
-	for y in range(1, shir-3):
-		if maze[x][y] == maze[x][y+2] == line_hor:
-			maze[x][y+1] = maze[x][y]
-			maze[x][y+2] = maze[x][y]
-
+'''
+################# прихорашиваем #######################	
 # сливаем соседние вертикали
 for x in range(1, dlin-2, 2):
 	for y in range(0, shir, 2):
@@ -128,45 +185,78 @@ for x in range(1, dlin-2, 2):
 
 # ответвления вверх и вниз		
 for x in range(0, dlin, 2):
-	for y in range(0, shir-2, 2):
+	for y in range(0, shir-1, 2):
 		if maze[x][y] == line_hor:
 			if x+1<dlin and maze[x+1][y] == line_ver:
 				maze[x][y] = down
 			elif x>1 and maze[x-1][y] == line_ver:
 				maze[x][y] = up
-	
+
 # ответвления направо и налево, перекрестки
 for x in range(1, dlin-1):
-	for y in range(0, shir, 2):
+	for y in range(0, shir+2, 2):
 		if maze[x][y] == line_ver:
 			if maze[x-1][y] == line_ver and maze[x+1][y] == line_ver:
-				if 2 < y < shir-2 and maze[x][y-1] == line_hor and maze[x][y+1] == line_hor:
+				if 2 < y < shir+1 and maze[x][y-1] == line_hor and maze[x][y+1] == line_hor:
 					maze[x][y] = cross
 				elif 2 < y and maze[x][y-1] == line_hor:
 					maze[x][y] = left
 				elif y < shir-2 and maze[x][y+1] == line_hor:
 					maze[x][y] = right
 
-# углы
-for x in range(1, dlin-1):
-	for y in range(1, shir-1):
-		if x > 1 and y > 1 and maze[x][y] == line_ver and maze[x-1][y] == ' ':
-			if maze[x-1][y-1] == line_hor:
-				maze[x-1][y] = corner_up_left
-			elif maze[x-1][y+1] == line_hor:
-				maze[x-1][y] = corner_up_right
+# углы и кончики
+for x in range(1, dlin-1, 2):
+	for y in range(4, shir, 4):
+		if x >= 1 and y >= 2 and maze[x][y] == line_ver and maze[x-1][y] == down:
+			if maze[x-1][y-1] != maze[x-1][y+1]:
+				if maze[x-1][y-1] == line_hor:
+					maze[x-1][y] = corner_up_left
+				elif maze[x-1][y+1] == line_hor:
+					maze[x-1][y] = corner_up_right
+			elif maze[x-1][y-1] == maze[x-1][y+1] == space:
+				maze[x-1][y] = u'\u257B'.encode('utf-8')
 
-		if x < dlin-1 and y < shir-2 and maze[x][y] == line_ver and maze[x+1][y] == ' ':
-			if maze[x+1][y-1] == line_hor:
-				maze[x+1][y] = corner_down_left
-			elif maze[x+1][y+1] == line_hor:
-				maze[x+1][y] = corner_down_right
+		if x < dlin-1 and y < shir and maze[x][y] == line_ver and maze[x+1][y] == up:
+			if maze[x+1][y-1] != maze[x+1][y+1]:
+				if maze[x+1][y-1] == line_hor:
+					maze[x+1][y] = corner_down_left
+				elif maze[x+1][y+1] == line_hor:
+					maze[x+1][y] = corner_down_right
+			elif maze[x+1][y-1] == maze[x+1][y+1] == space:
+				maze[x+1][y] = u'\u2579'.encode('utf-8')
+
 maze[0][0] = corner_up_right
-maze[0][shir-2] = corner_up_left
-maze[dlin-1][0] = corner_down_right
-maze[dlin-1][shir-2] = corner_down_left
+maze[0][-1] = corner_up_left
+maze[-1][0] = corner_down_right
+maze[-1][-1] = corner_down_left
+################# прихорашиваем #######################	
+'''
+
+f = open('maze_output.html', 'w')
+maze_source = open('maze_source.html', 'r')
+f.write(maze_source.read())
+maze_source.close()
+f.write('\n' + '    width: ' + str(n*20) + 'px;' + '\n' + '    height: ' + str(20*(n-1)) + 'px;' + '\n' + '   }' + 
+'\n' + ' </style>' + '\n' + ' </head>'  + '\n' + ' <body>'  + '\n' + '  <div class="main">' + '\n')
+for x in range(1, dlin, 2):
+	for y in range(2, shir, 4):
+		if maze[x][y-2] == line_ver:
+			if maze[x+1][y] == line_hor:
+				f.write('   <div class="left_bottom"></div>' + '\n')
+			else:
+				f.write('   <div class="left"></div>' + '\n')
+		elif maze[x][y-2] == space:
+			if maze[x+1][y] == line_hor:
+				f.write('   <div class="bottom"></div>' + '\n')
+			else:
+				f.write('   <div class="none"></div>' + '\n')
 
 
+f.write('  </div>' + '\n' + ' </body>' + '\n' + '</html>')
+
+f.close()
+
+'''
 #вывод лабиринта
 for row in maze:
-	 print(''.join(list(map(str, row))))
+	 print(''.join(list(map(str, row))))'''
