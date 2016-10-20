@@ -1,2 +1,2 @@
 # maze generator
-simple maze generator using the massive
+simple maze generator using array
