@@ -1,0 +1,109 @@
+
+<button id="right">right</button>
+<button id="left">left</button>
+<button id="up">up</button>
+<button id="down">down</button>
+
+
+
+    <!-- JavaScripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js" integrity="sha384-I6F5OKECLVtK/BL+8iSLDEHowSAfUo76ZL9+kGAgTRdiByINKJaqTPH/QVNS1VDb" crossorigin="anonymous"></script>
+
+    <script>
+    $( document ).ready( initEvents );
+
+      x = 1;
+      y = 1;
+      current_cell_id = "cell_" + x + "_" + y;
+      $("#" + current_cell_id).removeClass("invsbl");
+
+    function initEvents( jQuery ) {
+
+        $("#right").on('click', function(e) { 
+                move_right("right");
+            }
+        );
+
+        $("#left").on('click', function(e) { 
+                move_left("left");
+            }
+        );
+
+        $("#up").on('click', function(e) { 
+                move_up("up");
+            }
+        );        
+
+        $("#down").on('click', function(e) { 
+                move_down("down");
+            }
+        );
+
+    }
+
+   function move_down() {
+         
+         down_ceil_id = "ceil_" + (x+1) + "_" + y;
+         if (!document.getElementById(down_ceil_id)) {
+            $("#" + current_cell_id).addClass("invsbl");
+            x = x + 1;
+            current_cell_id = "cell_" + x + "_" + y;
+            $("#" + current_cell_id).removeClass("invsbl");
+         }
+         
+   
+    }
+
+    function move_up() {
+         
+         up_ceil_id = "ceil_" + x + "_" + y;
+         if (!document.getElementById(up_ceil_id))  {
+            $("#" + current_cell_id).addClass("invsbl");
+            x = x - 1;
+            current_cell_id = "cell_" + x + "_" + y;
+            $("#" + current_cell_id).removeClass("invsbl");
+         }
+         
+   
+    }
+
+    function move_left() {
+         
+         left_wall_id = "wall_" + x + "_" + y;
+         if (!document.getElementById(left_wall_id))  {
+            $("#" + current_cell_id).addClass("invsbl");
+            y = y - 1;
+            current_cell_id = "cell_" + x + "_" + y;
+            $("#" + current_cell_id).removeClass("invsbl");
+         }
+   
+    }
+
+    function move_right() {
+
+         right_wall_id = "wall_" + x + "_" + (y+1);
+         if (!document.getElementById(right_wall_id))  {
+            $("#" + current_cell_id).addClass("invsbl");
+            y = y + 1;
+            current_cell_id = "cell_" + x + "_" + y;
+            $("#" + current_cell_id).removeClass("invsbl");
+         }
+         
+   
+    }
+
+
+
+
+    </script>
+
+
+
+
+
+
+
+
+
+ </body>
+</html>
